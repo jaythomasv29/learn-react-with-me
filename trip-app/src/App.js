@@ -1,0 +1,126 @@
+import { useState } from "react";
+import initialItems from "./list";
+
+function App() {
+  const [items, setItems] = useState(initialItems);
+  return (
+    <div className="app">
+      <Logo />
+      <Form items={items} setItems={setItems} />
+      <PackingList items={items} setItems={setItems} />
+      <Stats />
+    </div>
+  );
+}
+
+function Logo() {
+  return <h1>🌴 Far Away 🧳</h1>;
+}
+
+function Form({ items, setItems }) {
+  const [quantity, setQuantity] = useState(1); // state for input element
+  const [description, setDescription] = useState(""); // state for input element
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!description) return;
+    const newItem = {
+      id: Date.now(),
+      quantity: Number(quantity),
+      description,
+      packed: false,
+    };
+    console.log("Add happened", newItem);
+    setItems((prevItems) => [...prevItems, newItem]);
+
+    console.log(items);
+    setDescription("");
+  };
+
+  return (
+    <form className="add-form" onSubmit={handleSubmit}>
+      <h3>What do you need for your 😍 trip? </h3>
+      <select
+        value={quantity}
+        onChange={(e) => {
+          console.log(e.target.value);
+          setQuantity(e.target.value);
+        }}
+      >
+        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
+          <option value={num} key={num}>
+            {num}
+          </option>
+        ))}
+      </select>
+      <input
+        type="text"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Item..."
+        id=""
+      />
+      <button>Add</button>
+    </form>
+  );
+}
+
+function PackingList({ items, setItems }) {
+  const togglePacked = (id) => {
+    // find the current by id
+    // map it into a new array
+    //set the state with the rest and newly modified item
+    const foundItem = items.find((item) => item.id === id);
+    const updatedItems = items.map((item) => {
+      if(item.id === foundItem.id) {
+        return {...item, packed: !foundItem.packed}
+      }
+      return item
+    })
+    setItems(updatedItems);
+  };
+
+  return (
+    <div className="list">
+      <ul>
+        {items.map((item) => {
+          return (
+            <Item
+              key={item.id}
+              {...item}
+              togglePacked={() => togglePacked(item.id)}
+            />
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function Item({ id, description, quantity, packed, togglePacked }) {
+  return (
+    <li>
+      <input
+        onClick={togglePacked}
+        type="checkbox"
+        defaultChecked={packed}
+        name="isPacked"
+        id=""
+      />
+      <span style={packed ? { textDecoration: "line-through" } : {}}>
+        {quantity} {description}
+      </span>
+      <button>❌</button>
+    </li>
+  );
+}
+
+function Stats() {
+  return (
+    <footer className="stats">
+      <em>You have X items on your list, and you already packed X (X%)</em>
+    </footer>
+  );
+}
+
+export default App;
