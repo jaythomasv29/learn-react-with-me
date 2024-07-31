@@ -3,12 +3,13 @@ import initialItems from "./list";
 
 function App() {
   const [items, setItems] = useState(initialItems);
+
   return (
     <div className="app">
       <Logo />
       <Form items={items} setItems={setItems} />
       <PackingList items={items} setItems={setItems} />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -28,7 +29,7 @@ function Form({ items, setItems }) {
   const resetForm = () => {
     setDescription("");
     setQuantity(1);
-  }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,8 +41,7 @@ function Form({ items, setItems }) {
       packed: false,
     };
     handleAddItem(newItem);
-    resetForm()
-    
+    resetForm();
   };
 
   return (
@@ -114,6 +114,7 @@ function PackingList({ items, setItems }) {
 }
 
 function Item({ id, description, quantity, packed, togglePacked, deleteItem }) {
+
   return (
     <li>
       <input
@@ -124,6 +125,7 @@ function Item({ id, description, quantity, packed, togglePacked, deleteItem }) {
         name="isPacked"
         id=""
       />
+      
       <span style={packed ? { textDecoration: "line-through" } : {}}>
         {quantity} {description}
       </span>
@@ -132,10 +134,23 @@ function Item({ id, description, quantity, packed, togglePacked, deleteItem }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  if (items.length === 0)
+    return (
+      <footer className="stats">
+        <em>Start adding some items to your checklist 🚀</em>
+      </footer>
+    );
+    const numItems = items.length; // Derived state
+    const numPacked = items.filter((item) => item.packed).length;
+    const percentage = Math.round((numPacked / numItems) * 100);
+  
   return (
     <footer className="stats">
-      <em>You have X items on your list, and you already packed X (X%)</em>
+      <em>
+        You have packed {numPacked} of {numItems} items{" "}
+        {percentage === 100 ? "100% completed" : `${percentage}% completed`}{" "}🚀
+      </em>
     </footer>
   );
 }
