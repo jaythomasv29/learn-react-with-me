@@ -73,6 +73,27 @@ function Form({ items, setItems }) {
 }
 
 function PackingList({ items, setItems }) {
+  const [sortBy, setSortBy] = useState("completed");
+
+  let sortedItems;
+
+  if (sortBy === "input") sortedItems = items;
+  if (sortBy === "description") {
+    sortedItems = items.slice().sort((a, b) => {
+      const descA = a.description.toUpperCase();
+      const descB = b.description.toUpperCase();
+      if (descA < descB) {
+        return -1;
+      }
+      if (descA > descB) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+  if (sortBy === "completed")
+    sortedItems = items.slice().sort((a, b) => a.packed - b.packed);
+
   const deleteItem = (id) => {
     // filter the item based on the id
     // filter it out
@@ -95,10 +116,14 @@ function PackingList({ items, setItems }) {
     setItems(updatedItems);
   };
 
+  const clearList = () => {
+    if(window.confirm("Are you want to sure you clear list?")) setItems([]);
+  }
+
   return (
     <div className="list">
       <ul>
-        {items.map((item) => {
+        {sortedItems.map((item) => {
           return (
             <Item
               key={item.id}
@@ -109,12 +134,19 @@ function PackingList({ items, setItems }) {
           );
         })}
       </ul>
+      <div className="actions">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="input">Sort By Input Order</option>
+          <option value="description">Sort By Description (A-Z)</option>
+          <option value="completed">Sort By Completed</option>
+        </select>
+        <button onClick={clearList}>Clear List</button>
+      </div>
     </div>
   );
 }
 
 function Item({ id, description, quantity, packed, togglePacked, deleteItem }) {
-
   return (
     <li>
       <input
@@ -125,7 +157,7 @@ function Item({ id, description, quantity, packed, togglePacked, deleteItem }) {
         name="isPacked"
         id=""
       />
-      
+
       <span style={packed ? { textDecoration: "line-through" } : {}}>
         {quantity} {description}
       </span>
@@ -141,15 +173,15 @@ function Stats({ items }) {
         <em>Start adding some items to your checklist 🚀</em>
       </footer>
     );
-    const numItems = items.length; // Derived state
-    const numPacked = items.filter((item) => item.packed).length;
-    const percentage = Math.round((numPacked / numItems) * 100);
-  
+  const numItems = items.length; // Derived state
+  const numPacked = items.filter((item) => item.packed).length;
+  const percentage = Math.round((numPacked / numItems) * 100);
+
   return (
     <footer className="stats">
       <em>
         You have packed {numPacked} of {numItems} items{" "}
-        {percentage === 100 ? "100% completed" : `${percentage}% completed`}{" "}🚀
+        {percentage === 100 ? "100% completed" : `${percentage}% completed`} 🚀
       </em>
     </footer>
   );
