@@ -21,6 +21,15 @@ function Form({ items, setItems }) {
   const [quantity, setQuantity] = useState(1); // state for input element
   const [description, setDescription] = useState(""); // state for input element
 
+  const handleAddItem = (item) => {
+    setItems((prevItems) => [...prevItems, item]);
+  };
+
+  const resetForm = () => {
+    setDescription("");
+    setQuantity(1);
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!description) return;
@@ -30,11 +39,9 @@ function Form({ items, setItems }) {
       description,
       packed: false,
     };
-    console.log("Add happened", newItem);
-    setItems((prevItems) => [...prevItems, newItem]);
-
-    console.log(items);
-    setDescription("");
+    handleAddItem(newItem);
+    resetForm()
+    
   };
 
   return (
@@ -66,17 +73,25 @@ function Form({ items, setItems }) {
 }
 
 function PackingList({ items, setItems }) {
+  const deleteItem = (id) => {
+    // filter the item based on the id
+    // filter it out
+    // set the new state with the item filtered out
+    const filteredItems = items.filter((item) => item.id !== id);
+    setItems(filteredItems);
+  };
+
   const togglePacked = (id) => {
     // find the current by id
     // map it into a new array
     //set the state with the rest and newly modified item
     const foundItem = items.find((item) => item.id === id);
     const updatedItems = items.map((item) => {
-      if(item.id === foundItem.id) {
-        return {...item, packed: !foundItem.packed}
+      if (item.id === foundItem.id) {
+        return { ...item, packed: !foundItem.packed };
       }
-      return item
-    })
+      return item;
+    });
     setItems(updatedItems);
   };
 
@@ -89,6 +104,7 @@ function PackingList({ items, setItems }) {
               key={item.id}
               {...item}
               togglePacked={() => togglePacked(item.id)}
+              deleteItem={() => deleteItem(item.id)}
             />
           );
         })}
@@ -97,12 +113,13 @@ function PackingList({ items, setItems }) {
   );
 }
 
-function Item({ id, description, quantity, packed, togglePacked }) {
+function Item({ id, description, quantity, packed, togglePacked, deleteItem }) {
   return (
     <li>
       <input
-        onClick={togglePacked}
+        onChange={() => togglePacked(id)}
         type="checkbox"
+        value={packed}
         defaultChecked={packed}
         name="isPacked"
         id=""
@@ -110,7 +127,7 @@ function Item({ id, description, quantity, packed, togglePacked }) {
       <span style={packed ? { textDecoration: "line-through" } : {}}>
         {quantity} {description}
       </span>
-      <button>❌</button>
+      <button onClick={() => deleteItem(id)}>❌</button>
     </li>
   );
 }
