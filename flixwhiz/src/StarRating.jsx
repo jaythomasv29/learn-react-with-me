@@ -27,9 +27,6 @@ export default function StarRating({ maxRating = 0 }) {
       <div style={containerStyle}>
         <div style={starContainerStyle}>{Array.from({ length: maxRating }, (_, i) => <Star rating={rating} count={i + 1} onClick={() => handleStarClick(i)} key={i} />)}</div>
         <p style={textStyle}>{rating || ""}</p>
-
-
-
       </div>
     </>
   )
@@ -50,7 +47,7 @@ function Star({ onClick, count, rating }) {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 20 20"
-        fill={count <= rating ? "#FFFF00" :"#000"}
+        fill={count <= rating ? "#FFFF00" : "#000"}
         stroke="#000"
       >
         <path
